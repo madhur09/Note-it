@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "src/proto";
+
+import "google/api/annotations.proto";
+
+
+
+message LoginResponse {}
+
+message LoginRequest {
+    string user = 1;
+    string password = 2;
+}
+
+
+service AddService {
+
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/login/"
+            body: "LoginRequest"
+        };
+    };
+
+    // rpc Show(PageLimitRequest) returns (PageLimitResponse) {
+    //     option (google.api.http) = {
+    //         get: "/v1/show/{limit}/{pageNo}"
+    //     };
+    // };
+
+    // rpc Add(MovieRequest) returns (MoviesResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/add"
+    //         body: "*"
+    //     };
+    // };
+
+    // rpc Update(MovieIdRequest) returns (MoviesResponse) {
+    //     option (google.api.http) = {
+    //         put: "/v1/update/{id}"
+    //         body: "*"
+    //     };
+    // };
+
+    // rpc Delete(MovieId) returns (MoviesResponse) {
+    //     option (google.api.http) = {
+    //         delete: "/v1/delete/{id}"
+    //     };
+    // };
+
+    // rpc Search(SearchItem) returns (MoviesResponse) {
+    //     option (google.api.http) = {
+    //         get: "/v1/search/{item}"
+    //     };
+    // };
+}
