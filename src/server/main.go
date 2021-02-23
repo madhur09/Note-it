@@ -15,7 +15,6 @@ import (
 	// jwt "github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
@@ -27,14 +26,23 @@ var err error
 
 func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.DataLoss, "failed to get metadata")
-	}
-	xrid := md["user"]
-
-	fmt.Println(md)
-	fmt.Println(xrid)
+	// md, ok := metadata.FromIncomingContext(ctx)
+	// if !ok {
+	// 	return nil, status.Errorf(codes.DataLoss, "failed to get metadata")
+	// }
+	// xrid := md["user"]
+	// fmt.Println(md["User"])
+	// fmt.Println(md["user"])
+	// fmt.Println(md["grpcgateway-User"])
+	// fmt.Println(md["grpcgateway-user"])
+	// fmt.Println(md["Grpcgateway-User"])
+	// fmt.Println(md.Get("user"))
+	// fmt.Println(md.Get("User"))
+	// fmt.Println(md.Get("grpcgateway-user"))
+	// fmt.Println(md.Get("grpcgateway-User"))
+	// fmt.Println(md)
+	// fmt.Println(md.Get("grpcgateway-content-type"))
+	// fmt.Println(md["grpcgateway-content-type"])
 
 	userID := request.GetUser()
 	password := request.GetPassword()
@@ -66,6 +74,98 @@ func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 		message = "user and password not matched."
 	}
 	return &proto.LoginResponse{Message: message}, nil
+}
+
+func (s *server) Show(ctx context.Context, request *proto.PageLimitRequest) (*proto.PageLimitResponse, error) {
+	limit := request.GetLimit()
+	pageNo := request.GetPageNo()
+
+	statement := fmt.Sprintf("SELECT * FROM notes where isdeleted=0 limit %d, %d", pageNo*limit, limit)
+	rows, _ := db.Query(statement)
+
+	var rowCount int32
+	count := db.QueryRow("SELECT count(*) FROM notes where isdeleted=0")
+	count.Scan(&rowCount)
+
+	var result []*proto.NoteObject
+
+	for rows.Next() {
+		var res proto.NoteObject
+		rows.Scan(&res.Id, &res.Title, &res.Description, &res.IsPinned, &res.Color)
+		result = append(result, &res)
+	}
+
+	return &proto.PageLimitResponse{Notes: result, TotalRows: rowCount}, nil
+}
+
+func (s *server) Add(ctx context.Context, request *proto.CreateNoteRequest) (*proto.NoteResponse, error) {
+	db.Exec("Insert into notes values(?,?,?,?,?,?)", request.Title, request.Description, request.IsPinned, request.Color, 0)
+	rows, _ := db.Query("select * from notes where isdeleted=0")
+
+	var result []*proto.NoteObject
+
+	for rows.Next() {
+		var res proto.NoteObject
+		rows.Scan(&res.Id, &res.Title, &res.Description, &res.IsPinned, &res.Color)
+		result = append(result, &res)
+	}
+
+	return &proto.NoteResponse{Notes: result}, nil
+}
+
+func (s *server) Update(ctx context.Context, request *proto.NoteIdRequest) (*proto.NoteResponse, error) {
+	noteID := request.GetId()
+
+	db.Exec("update notes set title=?,description=?,ispinned=?,color=? where id=?", request.Title, request.Description, request.IsPinned, request.Color, noteID)
+
+	rows, _ := db.Query("select * from notes where isdeleted=0")
+
+	var result []*proto.NoteObject
+
+	for rows.Next() {
+		var res proto.NoteObject
+		rows.Scan(&res.Id, &res.Title, &res.Description, &res.IsPinned, &res.Color)
+		result = append(result, &res)
+	}
+	return &proto.NoteResponse{Notes: result}, nil
+}
+
+func (s *server) Delete(ctx context.Context, request *proto.NoteId) (*proto.NoteResponse, error) {
+	noteID := request.GetId()
+
+	sqlStatement := "update notes set isdeleted=1 WHERE id = ?"
+	_, err = db.Exec(sqlStatement, noteID)
+	if err != nil {
+		panic(err)
+	}
+
+	rows, _ := db.Query("select * from notes  where isdeleted=0")
+
+	var result []*proto.NoteObject
+
+	for rows.Next() {
+		var res proto.NoteObject
+		rows.Scan(&res.Id, &res.Title, &res.Description, &res.IsPinned, &res.Color)
+		result = append(result, &res)
+	}
+	return &proto.NoteResponse{Notes: result}, nil
+}
+
+func (s *server) Search(ctx context.Context, request *proto.SearchNote) (*proto.NoteResponse, error) {
+	item := request.GetItem()
+
+	query := fmt.Sprintf("SELECT * FROM notes WHERE title LIKE '%%%s%%' and isdeleted=0", item)
+
+	rows, _ := db.Query(query)
+
+	var result []*proto.NoteObject
+
+	for rows.Next() {
+		var res proto.NoteObject
+		rows.Scan(&res.Id, &res.Title, &res.Description, &res.IsPinned, &res.Color)
+		result = append(result, &res)
+	}
+	return &proto.NoteResponse{Notes: result}, nil
 }
 
 // var mySigningKey = []byte("captainjacksparrowsayshi")

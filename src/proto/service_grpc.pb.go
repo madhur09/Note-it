@@ -19,6 +19,11 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AddServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	Show(ctx context.Context, in *PageLimitRequest, opts ...grpc.CallOption) (*PageLimitResponse, error)
+	Add(ctx context.Context, in *CreateNoteRequest, opts ...grpc.CallOption) (*NoteResponse, error)
+	Update(ctx context.Context, in *NoteIdRequest, opts ...grpc.CallOption) (*NoteResponse, error)
+	Delete(ctx context.Context, in *NoteId, opts ...grpc.CallOption) (*NoteResponse, error)
+	Search(ctx context.Context, in *SearchNote, opts ...grpc.CallOption) (*NoteResponse, error)
 }
 
 type addServiceClient struct {
@@ -38,11 +43,61 @@ func (c *addServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...
 	return out, nil
 }
 
+func (c *addServiceClient) Show(ctx context.Context, in *PageLimitRequest, opts ...grpc.CallOption) (*PageLimitResponse, error) {
+	out := new(PageLimitResponse)
+	err := c.cc.Invoke(ctx, "/proto.AddService/Show", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *addServiceClient) Add(ctx context.Context, in *CreateNoteRequest, opts ...grpc.CallOption) (*NoteResponse, error) {
+	out := new(NoteResponse)
+	err := c.cc.Invoke(ctx, "/proto.AddService/Add", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *addServiceClient) Update(ctx context.Context, in *NoteIdRequest, opts ...grpc.CallOption) (*NoteResponse, error) {
+	out := new(NoteResponse)
+	err := c.cc.Invoke(ctx, "/proto.AddService/Update", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *addServiceClient) Delete(ctx context.Context, in *NoteId, opts ...grpc.CallOption) (*NoteResponse, error) {
+	out := new(NoteResponse)
+	err := c.cc.Invoke(ctx, "/proto.AddService/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *addServiceClient) Search(ctx context.Context, in *SearchNote, opts ...grpc.CallOption) (*NoteResponse, error) {
+	out := new(NoteResponse)
+	err := c.cc.Invoke(ctx, "/proto.AddService/Search", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AddServiceServer is the server API for AddService service.
 // All implementations must embed UnimplementedAddServiceServer
 // for forward compatibility
 type AddServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	Show(context.Context, *PageLimitRequest) (*PageLimitResponse, error)
+	Add(context.Context, *CreateNoteRequest) (*NoteResponse, error)
+	Update(context.Context, *NoteIdRequest) (*NoteResponse, error)
+	Delete(context.Context, *NoteId) (*NoteResponse, error)
+	Search(context.Context, *SearchNote) (*NoteResponse, error)
 	// mustEmbedUnimplementedAddServiceServer()
 }
 
@@ -52,6 +107,21 @@ type UnimplementedAddServiceServer struct {
 
 func (UnimplementedAddServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAddServiceServer) Show(context.Context, *PageLimitRequest) (*PageLimitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Show not implemented")
+}
+func (UnimplementedAddServiceServer) Add(context.Context, *CreateNoteRequest) (*NoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
+}
+func (UnimplementedAddServiceServer) Update(context.Context, *NoteIdRequest) (*NoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedAddServiceServer) Delete(context.Context, *NoteId) (*NoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedAddServiceServer) Search(context.Context, *SearchNote) (*NoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Search not implemented")
 }
 func (UnimplementedAddServiceServer) mustEmbedUnimplementedAddServiceServer() {}
 
@@ -84,6 +154,96 @@ func _AddService_Login_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AddService_Show_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PageLimitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddServiceServer).Show(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AddService/Show",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddServiceServer).Show(ctx, req.(*PageLimitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AddService_Add_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddServiceServer).Add(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AddService/Add",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddServiceServer).Add(ctx, req.(*CreateNoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AddService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NoteIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AddService/Update",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddServiceServer).Update(ctx, req.(*NoteIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AddService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NoteId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AddService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddServiceServer).Delete(ctx, req.(*NoteId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AddService_Search_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchNote)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddServiceServer).Search(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AddService/Search",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddServiceServer).Search(ctx, req.(*SearchNote))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AddService_ServiceDesc is the grpc.ServiceDesc for AddService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +254,26 @@ var AddService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AddService_Login_Handler,
+		},
+		{
+			MethodName: "Show",
+			Handler:    _AddService_Show_Handler,
+		},
+		{
+			MethodName: "Add",
+			Handler:    _AddService_Add_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _AddService_Update_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _AddService_Delete_Handler,
+		},
+		{
+			MethodName: "Search",
+			Handler:    _AddService_Search_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

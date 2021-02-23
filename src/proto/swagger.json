@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Note-it APIs",
-    "version": "1.1.0"
+    "title": "proto/service.proto",
+    "version": "version not set"
   },
   "tags": [
     {

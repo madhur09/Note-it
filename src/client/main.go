@@ -65,6 +65,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -75,6 +76,7 @@ import (
 )
 
 func serveSwagger(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Header["Token"])
 	http.ServeFile(w, r, "../swaggerui/swagger.json")
 }
 
